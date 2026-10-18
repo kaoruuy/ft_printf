@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_printf.h"
+#include "libft/libft.h"
 #include <unistd.h>
 #include <limits.h>
 
@@ -23,32 +24,41 @@ int	ft_print_char(char character)
 
 int	ft_print_string(const char *string)
 {
-	int	length;
+	size_t	length;
+	ssize_t	written;
+	int		count;
 
 	if (!string)
 		string = "(null)";
-	length = 0;
-	while (string[length])
+	length = ft_strlen(string);
+	if (length > INT_MAX)
+		return (-1);
+	count = (int)length;
+	while (length > 0)
 	{
-		if (length == INT_MAX || ft_print_char(string[length]) < 0)
+		written = write(1, string, length);
+		if (written <= 0)
 			return (-1);
-		length++;
+		string += written;
+		length -= written;
 	}
-	return (length);
+	return (count);
 }
 
 int	ft_print_number(unsigned long number, unsigned int base, int uppercase)
 {
 	const char	*digits;
+	char		digit;
 	int			length;
 
 	digits = "0123456789abcdef";
-	if (uppercase)
-		digits = "0123456789ABCDEF";
 	length = 0;
 	if (number >= base)
 		length = ft_print_number(number / base, base, uppercase);
-	if (length < 0 || ft_print_char(digits[number % base]) < 0)
+	digit = digits[number % base];
+	if (uppercase)
+		digit = ft_toupper(digit);
+	if (length < 0 || ft_print_char(digit) < 0)
 		return (-1);
 	return (length + 1);
 }

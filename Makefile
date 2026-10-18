@@ -6,22 +6,32 @@ ARFLAGS = rcs
 
 SRCS = ft_printf.c ft_print.c
 OBJS = $(SRCS:.c=.o)
+LIBFT_DIR = libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(LIBFT)
+	cp $(LIBFT) $(NAME)
 	$(AR) $(ARFLAGS) $(NAME) $(OBJS)
 
-%.o: %.c ft_printf.h
+$(LIBFT): FORCE
+	$(MAKE) -C $(LIBFT_DIR)
+
+%.o: %.c ft_printf.h $(LIBFT_DIR)/libft.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
+	$(MAKE) -C $(LIBFT_DIR) clean
 	rm -f $(OBJS)
 
 fclean: clean
+	$(MAKE) -C $(LIBFT_DIR) fclean
 	rm -f $(NAME)
 
 re: fclean
 	$(MAKE) all
 
-.PHONY: all clean fclean re
+FORCE:
+
+.PHONY: all clean fclean re FORCE
